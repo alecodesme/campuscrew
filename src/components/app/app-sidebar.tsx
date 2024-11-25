@@ -128,10 +128,8 @@ export function AppSidebar() {
                     <span>Billing</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() =>{
-                    console.log(getCookie("user_role"))
-                    
                     deleteCookie(getCookie("user_role")!)
-                    //router?.replace("/auth/sign-in")
+                    router?.replace("/auth/sign-in")
                   }}>
                     <span>Sign out</span>
                   </DropdownMenuItem>
