@@ -1,5 +1,12 @@
+import Layout from "@/components/app/Layout"
+import withRoleProtection from "@/hoc/hoc";
+
 const Admin = () => {
-    return <h1>Admin</h1>
+    return <Layout>
+        <div>
+            ADMIN
+        </div>
+    </Layout>
 }   
 
-export default Admin
+export default withRoleProtection(Admin, ['admin']);
