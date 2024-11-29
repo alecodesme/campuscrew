@@ -7,6 +7,6 @@ const Admin = () => {
             ADMIN
         </div>
     </Layout>
-}   
+}
 
 export default withRoleProtection(Admin, ['admin']);
