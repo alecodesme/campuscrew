@@ -4,18 +4,22 @@ import axios from 'axios';
 import { User } from '../interfaces/User';
 import Loader from '@/components/app/loaders/Loader';
 import { BASE_URL } from '@/api/api';
+import { University } from '@/interfaces/University';
 
 interface AuthContextType {
     user: User | null;
+    university: University | null;
     loading: boolean;
     logout: () => void;
     setUser: React.Dispatch<React.SetStateAction<User | null>>;
+    setUniversity: React.Dispatch<React.SetStateAction<University | null>>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
+    const [university, setUniversity] = useState<University | null>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
@@ -29,15 +33,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const token = localStorage.getItem('authToken');
 
         if (!token) {
-            // Si no hay token y se intenta acceder a rutas protegidas
             if (protectedRoutes.includes(router.pathname)) {
                 router.replace('/auth/sign-in');
             } else {
-                // Si está en rutas públicas, permitir acceso
                 setLoading(false);
             }
         } else {
-            // Si hay token, obtener datos del usuario
             fetchUserData(token);
         }
     }, [router.pathname]);
@@ -48,7 +49,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 headers: { Authorization: `Bearer ${token}` },
             });
             const userData = response.data;
-            setUser(userData);
+            console.log(userData)
+            if (userData.user.role == 'admin') {
+                setUser(userData.user);
+                setUniversity(null)
+            } else {
+                setUser(userData.user);
+                setUniversity(userData.university)
+            }
+
         } catch (error) {
             setUser(null);
             localStorage.removeItem('authToken');
@@ -64,21 +73,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const currentPath = router.pathname;
 
         if (publicRoutes.includes(currentPath)) {
-            // Si la ruta es pública, permitir acceso
             return;
         }
 
         if (!user) {
-            // Si no hay usuario y la ruta no es pública, redirigir al login
             router.push('/auth/sign-in');
             return;
         }
 
         if (user.role === 'admin' && !adminRoutes.includes(currentPath)) {
-            // Si el rol es admin y la ruta no es válida, redirigir a /admin
             router.push('/admin');
         } else if (user.role === 'university' && !universityRoutes.includes(currentPath)) {
-            // Si el rol es university y la ruta no es válida, redirigir a /university
             router.push('/university');
         }
     }, [user, router.pathname, loading]);
@@ -90,7 +95,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, logout, setUser }}>
+        <AuthContext.Provider value={{ user, loading, logout, setUser, setUniversity, university }}>
             <div className={`page-transition ${loading ? 'loading' : ''} transition-opacity duration-1000 ease-in-out ${loading ? 'opacity-0' : 'opacity-100'}`}>
                 {loading ? <Loader /> : children}
             </div>

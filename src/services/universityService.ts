@@ -1,3 +1,4 @@
+import { Club } from "@/interfaces/Club";
 import { University } from "@/interfaces/University";
 import { UniversityRepository } from "@/repositories/universityRepository";
 
@@ -17,5 +18,8 @@ export class UniversityService {
     }
     async fetchAllUniversities(): Promise<University[]> {
         return await this.repository.getAllUniversities();
+    }
+    async fetchAllClubsByUniversity(universityId: number): Promise<Club[]> {
+        return await this.repository.getAllClubsByUniversity(universityId);
     }
 }

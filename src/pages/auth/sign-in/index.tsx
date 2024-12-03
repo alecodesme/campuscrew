@@ -13,7 +13,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { user, setUser } = useAuth()
+  const { user, setUser, setUniversity } = useAuth()
 
   const router = useRouter()
 
@@ -23,16 +23,15 @@ const LoginPage = () => {
 
     try {
       const result = await authService.signIn(email, password);
-      console.log(result)
       if (result.success) {
-
         localStorage.setItem("authToken", result.data.token);
-
-        // Redirigir según el rol
         if (result.data.user.role === "admin") {
           setUser(result.data.user)
+          setUniversity(null)
           router.push("/admin");
         } else if (result.data.user.role === "university") {
+          setUser(result.data.user)
+          setUniversity(result.data.university)
           router.push("/university");
         }
       } else {
