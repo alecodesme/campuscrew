@@ -1,5 +1,5 @@
 import { University } from "@/interfaces/University";
-import { UniversityRepository } from "@/repositories/JoinUsRepository";
+import { UniversityRepository } from "@/repositories/universityRepository";
 
 export class UniversityService {
     private repository: UniversityRepository;
@@ -14,5 +14,8 @@ export class UniversityService {
 
     async fetchUniversity(id: number): Promise<University> {
         return await this.repository.getUniversityById(id);
+    }
+    async fetchAllUniversities(): Promise<University[]> {
+        return await this.repository.getAllUniversities();
     }
 }

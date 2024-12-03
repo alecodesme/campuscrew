@@ -1,5 +1,4 @@
 import Layout from "@/components/app/Layout"
-import withRoleProtection from "@/hoc/hoc";
 
 const University = () => {
     return <Layout>
@@ -10,4 +9,4 @@ const University = () => {
 }
 
 
-export default withRoleProtection(University, ['university']);
+export default University;

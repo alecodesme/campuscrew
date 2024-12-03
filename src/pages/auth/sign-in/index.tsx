@@ -1,39 +1,58 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import withRoleProtection from "@/hoc/hoc";
+
+import { User } from "@/interfaces/User";
+import { AuthService } from "@/services/authService";
+import { useAuth } from "@/context/AuthContext";
+
+
 
 const LoginPage = () => {
-  const [selectedRole, setSelectedRole] = useState<"admin" | "university" | null>(null);
-  const [username, setUsername] = useState("");
+  const authService = new AuthService();
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { user, setUser } = useAuth()
 
-  // Función para establecer una cookie
-  const setCookie = (name: string, value: string, days: number) => {
-    const expires = new Date();
-    expires.setDate(expires.getDate() + days);
-    document.cookie = `${name}=${value}; expires=${expires.toUTCString()}; path=/`;
+  const router = useRouter()
+
+  const handleLogin = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await authService.signIn(email, password);
+      console.log(result)
+      if (result.success) {
+
+        localStorage.setItem("authToken", result.data.token);
+
+        // Redirigir según el rol
+        if (result.data.user.role === "admin") {
+          setUser(result.data.user)
+          router.push("/admin");
+        } else if (result.data.user.role === "university") {
+          router.push("/university");
+        }
+      } else {
+        setError(result.message);
+      }
+    } catch (err) {
+      console.error(err);
+      setError("An unexpected error occurred.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleLogin = () => {
-    if (!selectedRole) {
-      alert("Por favor, selecciona un rol antes de continuar.");
-      return;
-    }
-
-    // Simular autenticación básica
-    if (username === "admin" && password === "admin" && selectedRole === "admin") {
-      setCookie("user_role", "admin", 1); // Establecer cookie con rol 'admin'
-      router.push("/admin");
-    } else if (username === "university" && password === "university" && selectedRole === "university") {
-      setCookie("user_role", "university", 1); // Establecer cookie con rol 'university'
-      router.push("/university");
-    } else {
-      alert("Credenciales incorrectas. Inténtalo de nuevo.");
-    }
-  };
-
-  return (
+  return user ? (
+    <div className="flex items-center justify-center min-h-screen ">
+      <div className="bg-white p-8 rounded-lg max-w-md w-full text-center">
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">You're logged in.</h1>
+      </div>
+    </div>
+  ) : (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
         <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Inicio de Sesión</h1>
@@ -41,9 +60,9 @@ const LoginPage = () => {
           <label className="block text-gray-700 font-medium mb-2">Usuario</label>
           <input
             type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full p-2  text-black border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
             placeholder="Escribe tu usuario"
           />
         </div>
@@ -53,40 +72,23 @@ const LoginPage = () => {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
+            className="w-full text-black p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
             placeholder="Escribe tu contraseña"
           />
-        </div>
-        <div className="mb-6">
-          <label className="block text-gray-700 font-medium mb-2">Selecciona tu rol</label>
-          <div className="flex gap-4">
-            <button
-              onClick={() => setSelectedRole("admin")}
-              className={`p-2 w-full rounded-lg border ${
-                selectedRole === "admin" ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-800"
-              }`}
-            >
-              Administrador
-            </button>
-            <button
-              onClick={() => setSelectedRole("university")}
-              className={`p-2 w-full rounded-lg border ${
-                selectedRole === "university" ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-800"
-              }`}
-            >
-              Universidad
-            </button>
-          </div>
         </div>
         <button
           onClick={handleLogin}
           className="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-300"
         >
-          Iniciar Sesión
+          {
+            loading ? "Cargando..." : 'Iniciar Sesión'
+          }
         </button>
+
+        {error && <div className="py-2 flex items-center justify-center font-bold mt-2 rounded bg-red-50 text-red-500">{error}</div>}
       </div>
     </div>
   );
 };
 
-export default withRoleProtection(LoginPage,  []);
+export default LoginPage
