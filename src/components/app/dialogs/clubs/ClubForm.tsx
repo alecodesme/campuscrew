@@ -1,24 +1,35 @@
 import { useEffect, useState } from "react";
 import TagSelector from "../../club/tag-selector";
 import { Club } from "@/interfaces/Club";
-import { DialogContent } from "@/components/ui/dialog";
+import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { availableTags } from "@/lib/app/club-categories";
+import { ClubService } from "@/services/clubService";
+import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
-interface CreateClubFormProps {
+interface ClubFormProps {
+    isOpen: boolean,
+    mode: "create" | "edit";
+    club?: Club;
     onCreatedClub: (club: Club) => void;
+    onEditedClub: (club: Club) => void;
     setOpenCreateClub: (open: boolean) => void;
 }
 
-const CreateClubForm = ({ onCreatedClub, setOpenCreateClub }: CreateClubFormProps) => {
+const ClubForm = ({ mode, club, setOpenCreateClub, onCreatedClub, isOpen, onEditedClub }: ClubFormProps) => {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
-    const [universityId, setUniversityId] = useState("");
     const [email, setEmail] = useState("");
     const [isActive, setIsActive] = useState(false);
     const [selectedTags, setTags] = useState<string[]>([]);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isFormValid, setIsFormValid] = useState(false);
-    const availableTags: string[] = ["technology", "robotics", "science", "art", "music"];
-    const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [isLoading, setIsLoading] = useState(false);
+    const { toast } = useToast()
+
+    const { university } = useAuth()
+
+    const clubService = new ClubService()
 
     const validateFields = () => {
         const newErrors: Record<string, string> = {};
@@ -42,38 +53,87 @@ const CreateClubForm = ({ onCreatedClub, setOpenCreateClub }: CreateClubFormProp
     };
 
     useEffect(() => {
+        if (isOpen && mode === 'edit') {
+            const tagsArray = club?.tags.split(", ").map(tag => tag.trim());
+            setName(club!.name);
+            setDescription(club!.description);
+            setEmail(club!.email);
+            setIsActive(club!.is_active);
+            setTags(tagsArray!);
+            setErrors({});
+            setIsFormValid(true);
+
+        } else {
+            clearForm()
+        }
+    }, [isOpen])
+
+    useEffect(() => {
         const allFieldsValid =
             name.trim() &&
             description.trim() &&
             email.trim() &&
             /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         setIsFormValid((allFieldsValid && Object.keys(errors).length === 0) as boolean);
-    }, [name, description, universityId, email, errors]);
+    }, [name, description, email, errors]);
 
-    const handleSubmit = () => {
-        setIsLoading(true)
-        if (!validateFields()) return;
+    const handleSubmit = async () => {
+        setIsLoading(true);
+        if (!validateFields()) {
+            setIsLoading(false);
+            return;
+        }
 
         const tagsString = selectedTags.join(", ");
-        const newClub: Club = {
+        const clubPayload: Club = {
+            ...club,
             name,
             description,
-            university_id: -1,
             email,
+            university_id: university?.id!,
             is_active: isActive,
             tags: tagsString,
         };
 
-        console.log("Nuevo club creado:", newClub);
-        clearForm()
-        onCreatedClub(newClub);
-        setOpenCreateClub(false)
+        if (mode == 'create') {
+            const response = await clubService.createClub(clubPayload)
+            if (response.status) {
+                toast({
+                    variant: 'default',
+                    className: "bg-green-500 text-white",
+                    title: response.data.message,
+                })
+                onCreatedClub(response.data.club);
+            }
 
+        } else {
+            const response = await clubService.editClub(club?.id!, clubPayload)
+            console.log(response)
+            if (response.status) {
+                toast({
+                    variant: 'default',
+                    className: "bg-green-500 text-white",
+                    title: response.data.message,
+                })
+                onEditedClub(response.data.club)
+            }
+        }
+
+
+        clearForm();
+        setOpenCreateClub(false);
+        setIsLoading(false);
     };
 
     return (
         <DialogContent className="bg-white text-black">
-            <div className="mb-4">
+            <DialogHeader>
+                <DialogTitle>{mode == 'create' ? 'Create club' : 'Edit club'}</DialogTitle>
+                <DialogDescription>
+                    {mode == 'create' ? 'Create a new club for your university 🚀' : 'Check if everything is fine is good to! ✅'}
+                </DialogDescription>
+            </DialogHeader>
+            <div className="mb-2">
                 <label className="font-bold">Name:</label>
                 <input
                     type="text"
@@ -85,7 +145,7 @@ const CreateClubForm = ({ onCreatedClub, setOpenCreateClub }: CreateClubFormProp
                 {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
             </div>
 
-            <div className="mb-4">
+            <div >
                 <label className="font-bold">Description:</label>
                 <textarea
                     value={description}
@@ -96,7 +156,7 @@ const CreateClubForm = ({ onCreatedClub, setOpenCreateClub }: CreateClubFormProp
                 {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
             </div>
 
-            <div className="mb-4">
+            <div className="mb-2">
                 <label className="font-bold">Email:</label>
                 <input
                     type="email"
@@ -108,7 +168,7 @@ const CreateClubForm = ({ onCreatedClub, setOpenCreateClub }: CreateClubFormProp
                 {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
             </div>
 
-            <div className="mb-4">
+            <div className="mb-2">
                 <label className="font-bold mb-2 block">Is Active:</label>
                 <div className="flex items-center space-x-2">
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -136,13 +196,11 @@ const CreateClubForm = ({ onCreatedClub, setOpenCreateClub }: CreateClubFormProp
                     disabled={!isFormValid}
                     className={`px-4 py-2 rounded-lg w-full text-white ${isFormValid ? "bg-green-500 hover:bg-green-600" : "bg-gray-400 cursor-not-allowed"}`}
                 >
-                    {
-                        isLoading ? 'Cargando...' : 'Create Club'
-                    }
+                    {isLoading ? "Loading..." : mode === "create" ? "Create Club" : "Update Club"}
                 </button>
             </div>
-        </DialogContent >
+        </DialogContent>
     );
 };
 
-export default CreateClubForm;
+export default ClubForm;

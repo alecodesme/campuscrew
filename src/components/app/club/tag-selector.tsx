@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import React, { useState } from "react";
+import React from "react";
 
 interface TagSelectorProps {
     availableTags: string[];
@@ -14,10 +14,8 @@ const TagSelector: React.FC<TagSelectorProps> = ({
 }) => {
     const handleTagChange = (tag: string) => {
         if (selectedTags.includes(tag)) {
-            // Remover el tag si ya está seleccionado
             onChange(selectedTags.filter((t) => t !== tag));
         } else {
-            // Agregar el tag si no está seleccionado
             onChange([...selectedTags, tag]);
         }
     };
@@ -29,22 +27,11 @@ const TagSelector: React.FC<TagSelectorProps> = ({
                 {availableTags.map((tag) => (
                     <div
                         key={tag}
-                        className={`px-4 py-2 rounded-full text-xs font-medium cursor-pointer flex items-center space-x-2 bg-gray-100 text-black`}
+                        className={`px-4 py-2 rounded-full text-xs font-medium cursor-pointer flex items-center space-x-2  ${selectedTags.includes(tag) ? 'bg-blue-100' : 'bg-gray-100'} text-black`}
                         onClick={() => handleTagChange(tag)}
                     >
                         <span>{tag}</span>
-                        {selectedTags.includes(tag) && (
-                            <span
-                                className="rounded-full text-xs w-5 h-5 flex justify-center items-center text-black"
 
-                                onClick={(e) => {
-                                    e.stopPropagation(); // Prevenir que se llame el handleTagChange
-                                    handleTagChange(tag);
-                                }}
-                            >
-                                <X size={15} />
-                            </span>
-                        )}
                     </div>
                 ))}
             </div>

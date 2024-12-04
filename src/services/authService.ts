@@ -23,7 +23,7 @@ export class AuthService {
             } else {
                 return {
                     success: false,
-                    message: "An unexpected error occurred. Please try again later.",
+                    message: error.response.data.error,
                 };
             }
         }
