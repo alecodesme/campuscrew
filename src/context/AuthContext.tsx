@@ -23,8 +23,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
-    // Rutas públicas y protegidas
-    const publicRoutes = ['/', '/joinus', '/auth/sign-in'];
+    const publicRoutes = ['/', '/joinus', '/auth/sign-in', '/student', '/gallery'];
     const protectedRoutes = ['/admin', '/universities', '/university', '/clubs'];
     const adminRoutes = ['/admin', '/universities'];
     const universityRoutes = ['/university', '/clubs'];
@@ -49,7 +48,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 headers: { Authorization: `Bearer ${token}` },
             });
             const userData = response.data;
-            console.log(userData)
             if (userData.user.role == 'admin') {
                 setUser(userData.user);
                 setUniversity(null)

@@ -9,5 +9,5 @@ export interface University {
     user_id?: number;
     email: string;
     domain: string;
-    status?: 'pending' | 'accepted' | 'declined'; // Estado de la universidad
+    status?: 'pending' | 'accepted' | 'rejected';
 }

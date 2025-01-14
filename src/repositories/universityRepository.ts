@@ -57,4 +57,17 @@ export class UniversityRepository {
             throw new Error("Error fetching universities");
         }
     }
+    async updateUniversityStatus(id: number, status: string, observation?: string): Promise<University> {
+        try {
+            const token = localStorage.getItem('authToken');
+            const response = await axios.put(`${this.apiUrl}/universities/${id}/status`, { status, observation }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            return response.data;
+        } catch (error) {
+            throw new Error(`Error updating university status: ${error}`);
+        }
+    }
 }

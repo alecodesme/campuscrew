@@ -22,4 +22,8 @@ export class UniversityService {
     async fetchAllClubsByUniversity(universityId: number): Promise<Club[]> {
         return await this.repository.getAllClubsByUniversity(universityId);
     }
+    async updateUniversityStatus(id: number, status: string, observation?: string): Promise<Record<string, any>> {
+        return await this.repository.updateUniversityStatus(id, status, observation);
+    }
+
 }

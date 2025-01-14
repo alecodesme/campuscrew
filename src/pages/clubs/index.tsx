@@ -137,7 +137,7 @@ const ClubsPage = () => {
             ) : (
 
                 <div className="p-0 h-full w-full overflow-y-hidden">
-                    <h1 className="text-2xl font-bold pl-2">Mis clubs</h1>
+                    <h1 className="text-2xl font-bold pl-2">Your clubs</h1>
 
                     <div className="p-2 flex flex-row gap-2">
                         <input
@@ -145,7 +145,7 @@ const ClubsPage = () => {
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
-                            placeholder="Buscar clubs por nombre"
+                            placeholder="Search clubs"
                         />
 
                         <div onClick={() => {
@@ -156,11 +156,11 @@ const ClubsPage = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-lg h-full overflow-hidden">
+                    <div className="rounded-lg h-full overflow-hidden">
                         <div className="h-full overflow-y-auto w-full flex flex-wrap" style={{ maxHeight: "675px" }}>
                             {
                                 filteredClubs.length === 0 ? (
-                                    <div className="text-center text-gray-500 w-full">No hay datos</div>
+                                    <div className="text-center text-gray-500 w-full">No data.</div>
                                 ) :
                                     filteredClubs.map((club: Club) => (
                                         <ClubCard

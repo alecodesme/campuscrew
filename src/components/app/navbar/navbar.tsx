@@ -12,11 +12,8 @@ const Navbar = () => {
                 <a href="/" className="text-gray-700 font-thin">
                     Home
                 </a>
-                <a href="#" className="text-gray-700 font-thin">
+                <a href="/gallery" className="text-gray-700 font-thin">
                     Gallery
-                </a>
-                <a href="#" className="text-gray-700 font-thin">
-                    Universities
                 </a>
             </nav>
 

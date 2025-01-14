@@ -1,9 +1,18 @@
 import React, { useState } from "react";
 import Navbar from "@/components/app/navbar/navbar";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { UniversityService } from "@/services/universityService";
 import { University } from "@/interfaces/University";
+import Footer from "@/components/app/footer/footer";
 
 const JoinUs = () => {
     const universityService = new UniversityService();
@@ -18,6 +27,7 @@ const JoinUs = () => {
         domain: "",
     });
 
+    const [currentStep, setCurrentStep] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
 
@@ -38,139 +48,166 @@ const JoinUs = () => {
         }
     };
 
-    return (
-        <div className="w-full h-full">
-            <Navbar />
-            <div className="w-full flex flex-row">
-                <div className="flex-1">
-                    <img src="https://www.stjohns.edu/sites/default/files/styles/640w/public/2022-09/20220908_activitiesfair_94_960x640.jpg?itok=a2fwA-2j" />
-                </div>
-                <div className="flex-1 flex flex-col justify-center pl-12 pr-40 gap-5">
-                    <div className="text-4xl font-extrabold text-black">Join Us!</div>
-                    <div className="text-gray-400">
-                        Connect your students, foster creativity, and build strong communities through student clubs.
-                        Sign up today and take the university experience to the next level 🙌🏽.
-                    </div>
-                </div>
-            </div>
-            <div className="w-full flex flex-col p-12">
-                <div className="flex flex-col text-black py-5">
-                    <span className="text-sm">Step 1</span>
-                    <span className="text-lg">General Info</span>
-                    <div className="border bg-gray-200 w-full h-[1px]"></div>
-                </div>
-                <div className="flex flex-col gap-3">
-                    <Input
-                        placeholder="University name"
-                        type="text"
-                        className="text-black w-1/3"
-                        onChange={(event) => handleChange("name", event.target.value)}
-                    />
-                    <Input
-                        placeholder="University cellphone"
-                        type="number"
-                        className="text-black w-1/3"
-                        onChange={(event) => handleChange("cellphone", event.target.value)}
-                    />
-                    <Input
-                        placeholder="Email contact"
-                        type="text"
-                        className="text-black w-1/3"
-                        onChange={(event) => handleChange("email", event.target.value)}
-                    />
-                </div>
-                <div className="flex flex-col text-black py-5">
-                    <span className="text-sm">Step 2</span>
-                    <span className="text-lg">Address Info</span>
-                    <div className="border bg-gray-200 w-full h-[1px]"></div>
-                </div>
-                <Input
-                    placeholder="University address"
-                    type="text"
-                    className="text-black w-1/3 mb-5"
-                    onChange={(event) => handleChange("address", event.target.value)}
-                />
-                <div className="flex flex-row gap-3">
+    const validateStep = () => {
+        switch (currentStep) {
+            case 1:
+                return (
+                    formData.name.trim() !== "" &&
+                    formData.cellphone.trim() !== "" &&
+                    formData.email.trim() !== ""
+                );
+            case 2:
+                return (
+                    formData.address.trim() !== "" &&
+                    formData.country.trim() !== "" &&
+                    formData.province.trim() !== "" &&
+                    formData.city.trim() !== ""
+                );
+            case 3:
+                return formData.domain.trim() !== "";
+            default:
+                return false;
+        }
+    };
 
-                    <div>
-                        <span className="text-sm text-black">Country</span>
-                        <Select onValueChange={(value) => handleChange("country", value)}>
-                            <SelectTrigger className="w-[180px] text-black">
-                                <SelectValue placeholder="Select a country" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>Countries</SelectLabel>
-                                    <SelectItem value="usa">USA</SelectItem>
-                                    <SelectItem value="canada">Canada</SelectItem>
-                                    <SelectItem value="uk">UK</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div>
-                        <span className="text-sm text-black">Province</span>
-                        <Select onValueChange={(value) => handleChange("province", value)}>
-                            <SelectTrigger className="w-[180px] text-black">
-                                <SelectValue placeholder="Select a province" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>Provinces</SelectLabel>
-                                    <SelectItem value="california">California</SelectItem>
-                                    <SelectItem value="ontario">Ontario</SelectItem>
-                                    <SelectItem value="london">London</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div>
-                        <span className="text-sm text-black">City</span>
-                        <Select onValueChange={(value) => handleChange("city", value)}>
-                            <SelectTrigger className="w-[180px] text-black">
-                                <SelectValue placeholder="Select a city" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>Cities</SelectLabel>
-                                    <SelectItem value="newyork">New York</SelectItem>
-                                    <SelectItem value="toronto">Toronto</SelectItem>
-                                    <SelectItem value="manchester">Manchester</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                    </div>
+    return (
+        <div className="w-full h-screen flex flex-col pb-10">
+            <Navbar />
+            <div className="flex flex-1">
+                <div className="w-1/2 h-full">
+                    <img
+                        src="https://www.stjohns.edu/sites/default/files/styles/640w/public/2022-09/20220908_activitiesfair_94_960x640.jpg?itok=a2fwA-2j"
+                        alt="University"
+                        className="w-full h-full object-cover"
+                    />
                 </div>
-                <div className="flex flex-col text-black py-5">
-                    <span className="text-sm">Step 3</span>
-                    <span className="text-lg">Domain Info</span>
-                    <div className="border bg-gray-200 w-full h-[1px]"></div>
+
+                <div className="w-1/2 h-full p-8 flex flex-col justify-center">
+                    <div className="text-4xl font-extrabold text-black mb-6">Join Us!</div>
+
+                    {/* Steps */}
+                    {currentStep === 1 && (
+                        <div className="flex flex-col gap-4">
+                            <div className="text-lg font-bold text-black">Step 1: General Info</div>
+                            <Input
+                                placeholder="University name"
+                                type="text"
+                                className="text-black"
+                                onChange={(event) => handleChange("name", event.target.value)}
+                            />
+                            <Input
+                                placeholder="University cellphone"
+                                type="number"
+                                className="text-black"
+                                onChange={(event) => handleChange("cellphone", event.target.value)}
+                            />
+                            <Input
+                                placeholder="Email contact"
+                                type="email"
+                                className="text-black"
+                                onChange={(event) => handleChange("email", event.target.value)}
+                            />
+                        </div>
+                    )}
+
+                    {currentStep === 2 && (
+                        <div className="flex flex-col gap-4">
+                            <div className="text-lg font-bold text-black">Step 2: Address Info</div>
+                            <Input
+                                placeholder="University address"
+                                type="text"
+                                className="text-black"
+                                onChange={(event) => handleChange("address", event.target.value)}
+                            />
+                            <Select onValueChange={(value) => handleChange("country", value)}>
+                                <SelectTrigger className="w-full text-black">
+                                    <SelectValue placeholder="Select a country" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Countries</SelectLabel>
+                                        <SelectItem value="usa">USA</SelectItem>
+                                        <SelectItem value="canada">Canada</SelectItem>
+                                        <SelectItem value="uk">UK</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                            <Select onValueChange={(value) => handleChange("province", value)}>
+                                <SelectTrigger className="w-full text-black">
+                                    <SelectValue placeholder="Select a province" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Provinces</SelectLabel>
+                                        <SelectItem value="california">California</SelectItem>
+                                        <SelectItem value="ontario">Ontario</SelectItem>
+                                        <SelectItem value="london">London</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                            <Select onValueChange={(value) => handleChange("city", value)}>
+                                <SelectTrigger className="w-full text-black">
+                                    <SelectValue placeholder="Select a city" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Cities</SelectLabel>
+                                        <SelectItem value="newyork">New York</SelectItem>
+                                        <SelectItem value="toronto">Toronto</SelectItem>
+                                        <SelectItem value="manchester">Manchester</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
+
+                    {currentStep === 3 && (
+                        <div className="flex flex-col gap-4">
+                            <div className="text-lg font-bold text-black">Step 3: Domain Info</div>
+                            <Input
+                                placeholder="Domain name"
+                                type="text"
+                                className="text-black"
+                                onChange={(event) => handleChange("domain", event.target.value)}
+                            />
+                        </div>
+                    )}
+
+                    {/* Navigation buttons */}
+                    <div className="flex justify-between mt-6">
+                        {currentStep > 1 && (
+                            <button
+                                className="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-700"
+                                onClick={() => setCurrentStep(currentStep - 1)}
+                            >
+                                Back
+                            </button>
+                        )}
+                        {currentStep < 3 ? (
+                            <button
+                                className={`px-6 py-2 rounded text-white ${validateStep() ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-300 cursor-not-allowed"
+                                    }`}
+                                onClick={() => validateStep() && setCurrentStep(currentStep + 1)}
+                                disabled={!validateStep()}
+                            >
+                                Next
+                            </button>
+                        ) : (
+                            <button
+                                className={`px-6 py-2 rounded text-white ${isLoading ? "bg-blue-300" : "bg-blue-600 hover:bg-blue-700"
+                                    }`}
+                                onClick={handleSubmit}
+                                disabled={isLoading}
+                            >
+                                {isLoading ? "Loading..." : "Submit"}
+                            </button>
+                        )}
+                    </div>
+                    {error && <div className="text-red-500 mt-3">{error}</div>}
                 </div>
-                <Input
-                    placeholder="Domain name"
-                    type="text"
-                    className="text-black w-1/3"
-                    onChange={(event) => handleChange("domain", event.target.value)}
-                />
-                <div className="flex flex-row gap-3 mt-5">
-                    <button
-                        className="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-700"
-                    //onClick={() => }
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        className={`px-6 py-2 rounded text-white ${isLoading ? "bg-blue-300" : "bg-blue-600 hover:bg-blue-700"}`}
-                        onClick={handleSubmit}
-                        disabled={isLoading}
-                    >
-                        {isLoading ? "Loading..." : "Continue"}
-                    </button>
-                </div>
-                {error && <div className="text-red-500 mt-3">{error}</div>}
             </div>
+            <Footer />
         </div>
     );
 };
-
-export default JoinUs;
+export default JoinUs

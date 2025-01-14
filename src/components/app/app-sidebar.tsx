@@ -13,10 +13,10 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { AuthService } from "@/services/authService";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@radix-ui/react-collapsible";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { ChevronDown, ChevronUp, Handshake, Home, University, User2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 
 export function AppSidebar() {
 
@@ -39,7 +39,7 @@ export function AppSidebar() {
   const itemsOnUniversity = [
     {
       title: "Home",
-      url: "/admin",
+      url: "/university",
       icon: Home,
     },
     {
@@ -55,7 +55,7 @@ export function AppSidebar() {
   const authService = new AuthService()
 
   return (
-    <Sidebar>
+    <Sidebar >
       <SidebarHeader className="p-0">
         {
           user?.role === "admin" ? <div></div> : <Image
@@ -68,13 +68,13 @@ export function AppSidebar() {
           />
         }
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="bg-black">
         <SidebarMenu>
           <Collapsible defaultOpen className="group/collapsible">
             <SidebarGroup className="px-0">
               <SidebarGroupLabel asChild>
                 <CollapsibleTrigger>
-                  <span className="font-bold text-base">Dashboard</span>
+                  <span className="font-bold text-base text-white px-2">Your space</span>
                   <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
                 </CollapsibleTrigger>
               </SidebarGroupLabel>
@@ -83,15 +83,15 @@ export function AppSidebar() {
                   <SidebarMenu>
                     {items.map((item) => (
                       <SidebarMenuItem
-                        className="hover:text-white" key={item.title}>
+                        className="hover:text-white px-3" key={item.title}>
                         <SidebarMenuButton
                           onClick={() => {
                             router.push(item.url)
                           }}
                           className={`${router.pathname == item.url
-                            ? "bg-indigo-500 rounded-none text-white"
+                            ? "bg-campus_secondary rounded-md text-black"
                             : "text-gray-500"
-                            } hover:bg-indigo-500 hover:rounded-none hover:text-white`}
+                            } hover:bg-campus_secondary hover:rounded-md hover:text-black cursor-pointer`}
                           asChild
                         >
                           <div>
@@ -108,13 +108,13 @@ export function AppSidebar() {
           </Collapsible>
         </SidebarMenu>
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="bg-black">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+              <DropdownMenuTrigger className="bg-campus_secondary" asChild>
                 <SidebarMenuButton>
-                  <User2 /> Username
+                  <User2 /> {user?.name} - {user?.role}
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
@@ -124,9 +124,6 @@ export function AppSidebar() {
               >
                 <DropdownMenuItem>
                   <span>Account</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span>Billing</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={async () => {
 
@@ -145,6 +142,7 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
+
     </Sidebar>
   );
 }

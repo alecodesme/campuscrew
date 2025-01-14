@@ -4,6 +4,7 @@ import Image from "next/image";
 import ImagePeople from '@/assets/university_people.png'
 import Statistics from "@/components/app/stadistics/stadistics";
 import UniversityRow from "@/components/app/participants/participants";
+import Footer from "@/components/app/footer/footer";
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
       </div>
       <Statistics />
       <UniversityRow />
+      <Footer />
     </div>
   );
 }

@@ -11,7 +11,7 @@ interface IClubCardProps {
 const ClubCard = ({ club, onEditAction, onDeleteAction }: IClubCardProps) => {
     return (
         <div className="w-1/3 p-2">
-            <div className="h-full flex flex-col px-4 py-5 border border-gray-300 rounded-xl">
+            <div className="flex bg-white flex-col px-4 py-5 border border-gray-300 rounded-xl">
                 <div className="font-bold text-xl mb-2 flex flex-row justify-between items-center">
                     <div>
                         {club.name}

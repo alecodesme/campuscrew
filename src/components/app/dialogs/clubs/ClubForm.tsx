@@ -108,7 +108,6 @@ const ClubForm = ({ mode, club, setOpenCreateClub, onCreatedClub, isOpen, onEdit
 
         } else {
             const response = await clubService.editClub(club?.id!, clubPayload)
-            console.log(response)
             if (response.status) {
                 toast({
                     variant: 'default',
